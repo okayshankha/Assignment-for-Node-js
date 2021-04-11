@@ -2,7 +2,8 @@
 
 
 Installation:
-    npm i
+- npm i
+- cp .env.sample .env
 
 ```
 End points:

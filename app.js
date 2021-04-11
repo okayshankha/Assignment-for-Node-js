@@ -13,7 +13,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(morgan('combined'))
-app.use(express.static('/uploads'));
+app.use('/uploads', express.static('uploads'))
 app.use(express.urlencoded({ limit: '50mb', extended: true }))
 
 
