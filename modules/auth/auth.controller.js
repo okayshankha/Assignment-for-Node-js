@@ -64,9 +64,10 @@ module.exports = {
 
             const userDataToSave = {
                 ...body,
-                image: req.file.path
+                image: req.file.filename
             }
             const user = await UserRepository.save(userDataToSave)
+            user.image = `http://${req.hostname}:${process.env.PORT}/uploads/${user.image}`
 
             const apiResponse = {
                 statusCode: 200,

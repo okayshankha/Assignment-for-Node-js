@@ -1,3 +1,4 @@
+const { ObjectId } = require("bson");
 const createError = require("http-errors")
 
 
@@ -7,6 +8,10 @@ module.exports = {
     async getAll(req, res) {
         try {
             const users = await UserRepository.getAll()
+            users.map(e => {
+                e.image = `http://${req.hostname}:${process.env.PORT}/uploads/${e.image}`
+            })
+
             const apiResponse = {
                 statusCode: 200,
                 message: "all user data fetched.",
@@ -21,7 +26,20 @@ module.exports = {
 
     async get(req, res) {
         try {
+            if (!ObjectId.isValid(req.params.id)) {
+                const apiError = createError(422, "invalid object id")
+                return res.status(apiError.statusCode).send(apiError)
+            }
+
             const user = await UserRepository.get(req.params.id)
+            if (!user) {
+                const apiResponse = {
+                    statusCode: 200,
+                    message: "user not found.",
+                }
+                return res.status(apiResponse.statusCode).send(apiResponse)
+            }
+            user.image = `http://${req.hostname}:${process.env.PORT}/uploads/${user.image}`
             const apiResponse = {
                 statusCode: 200,
                 message: "all user data fetched.",
@@ -37,7 +55,6 @@ module.exports = {
     async me(req, res) {
         try {
             if (!req.user) throw Error("User not found")
-
             const user = await UserRepository.findOneByEmail(req.user.email)
             if (!user) {
                 const apiError = createError(500)
@@ -45,6 +62,7 @@ module.exports = {
             }
 
             delete user.password
+            user.image = `http://${req.hostname}:${process.env.PORT}/uploads/${user.image}`
 
             const apiResponse = {
                 statusCode: 200,
